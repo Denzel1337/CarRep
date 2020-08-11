@@ -1,31 +1,18 @@
 package CarRep;
 
-public class Meh {
-    private Long id;
-    private String lastName;
-    private String firstName;
-    private String patronymic;
-    private String payhour;
+import java.util.ArrayList;
+import java.util.List;
 
-    public Meh(Long id, String lastName, String firstName, String patronymic, String payhour) {
-        this.id = id;
-        this.lastName = lastName;
-        this.firstName = firstName;
-        this.patronymic = patronymic;
+public class Meh extends Person {
+    public static List<Meh> mehList = new ArrayList<>();
+    private final String payhour;
+
+    public Meh(long id, String lastName, String firstName, String patronymic, String payhour) {
+        super(id, lastName, firstName, patronymic);
         this.payhour = payhour;
     }
-    public Long getId() {return id;}
-    public String getLastName() {
-        return lastName;
-    }
-    public String getFirstName() {
-        return firstName;
-    }
-    public String getPatronymic() {
-        return patronymic;
-    }
+
     public String getPayHour() {
-        return  payhour;
+        return payhour;
     }
-    public String getFullName() { return lastName + " " + firstName; }
 }

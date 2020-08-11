@@ -2,14 +2,11 @@ package CarRep;
 
 import java.sql.*;
 
-public class ConnectionDB {
-    Connection connection = null;
-    Statement statement = null;
-    String query = null;
-    ResultSet res = null;
+public abstract class ConnectionDB {
+    static Connection connection = null;
+    static Statement statement = null;
 
-
-    public void setConnection() {
+    public static void setConnection() {
         try {
             Class.forName("org.hsqldb.jdbcDriver");
         } catch (ClassNotFoundException e) {
@@ -32,19 +29,19 @@ public class ConnectionDB {
         }
     }
 
-    public void createTables() {
-        query = "CREATE TABLE clients (id IDENTITY , lastname VARCHAR(32), firstname varchar(32), patronymic varchar (32), phonenumber varchar(32))";
+    public static void createTables() {
+        String query = "CREATE TABLE clients (id IDENTITY , lastname VARCHAR(32), firstname varchar(32), patronymic varchar (32), phonenumber varchar(32))";
         try {
             statement.executeUpdate(query);
         } catch (SQLException ignored) {
-
         }
+
         query = "CREATE TABLE mehs (id IDENTITY , lastname VARCHAR(32), firstname varchar(32), patronymic varchar (32), payhour varchat(32))";
         try {
             statement.executeUpdate(query);
         } catch (SQLException ignored) {
-
         }
+
         query = "CREATE TABLE orders (id IDENTITY , Description varchar(255), Client varchar(32), Meh varchar(32), CreateDate datetime, endDate datetime, cost bigint, status varchar(255))";
         try {
             statement.executeUpdate(query);
@@ -52,65 +49,48 @@ public class ConnectionDB {
         }
     }
 
-    public void dropConnection() {
+    public static void getclientlist() {
         try {
-            statement.close();
-            statement = connection.createStatement();
-            query = "SHUTDOWN";
-            statement.execute(query);
-            statement.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void getclientlist() {
-        try {
-            query = "SELECT * FROM clients";
-            res = statement.executeQuery(query);
+            String query = "SELECT * FROM clients";
+            ResultSet res = statement.executeQuery(query);
 
             while (res.next()) {
-                ClientList.clientArrayList.add(new Client(res.getLong(1), res.getString(2), res.getString(3), res.getString(4),
+                Client.clientList.add(new Client(res.getLong(1), res.getString(2), res.getString(3), res.getString(4),
                         res.getString(5)));
             }
-        } catch (SQLException e) {
-            System.err.println("Не вывелось(((");
-
+        } catch (SQLException ignored) {
         }
     }
 
-    public void getMehList() {
+    public static void getMehList() {
+        ResultSet res;
+        String query = "SELECT * FROM mehs";
         try {
-            query = "SELECT * FROM mehs";
             res = statement.executeQuery(query);
-
             while (res.next()) {
-                MehList.mehArrayList.add(new Meh(res.getLong(1), res.getString(2), res.getString(3), res.getString(4),
+                Meh.mehList.add(new Meh(res.getLong(1), res.getString(2), res.getString(3), res.getString(4),
                         res.getString(5)));
             }
-        } catch (SQLException e) {
-            System.err.println("Не вывелось(((");
-
+        } catch (SQLException ignored) {
         }
     }
 
-    public void getOrderList() {
-        query = "SELECT * FROM orders";
+    public static void getOrderList() {
+        String query = "SELECT * FROM orders";
+        ResultSet res;
         try {
-
             res = statement.executeQuery(query);
 
             while (res.next()) {
-                OrderList.orderArrayList.add(new Order(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), res.getDate(5),
+                Order.orderList.add(new Order(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), res.getDate(5),
                         res.getDate(6), res.getString(7), res.getString(8)));
             }
-        } catch (SQLException e) {
-            System.err.println("Не вывелось.");
+        } catch (SQLException ignored) {
         }
     }
 
-    public void addOrder(String description, String client, String meh, Date createDate, Date endDate, String cost, String status) {
-        query = "INSERT INTO orders (Description, Client, Meh, CreateDate, endDate, cost, status) VALUES (?,?,?,?,?,?,?)";
+    public static void addOrder(String description, String client, String meh, Date createDate, Date endDate, String cost, String status) {
+        String query = "INSERT INTO orders (Description, Client, Meh, CreateDate, endDate, cost, status) VALUES (?,?,?,?,?,?,?)";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, description);
@@ -121,13 +101,12 @@ public class ConnectionDB {
             preparedStatement.setString(6, cost);
             preparedStatement.setString(7, status);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Не добавилось");
+        } catch (SQLException ignored) {
         }
     }
 
-    public void addClient(String lastName, String firstName, String patronymic, String phoneNumber) {
-        query = "INSERT INTO clients (lastname, firstname, patronymic, phonenumber) values (?,?,?,?)";
+    public static void addClient(String lastName, String firstName, String patronymic, String phoneNumber) {
+        String query = "INSERT INTO clients (lastname, firstname, patronymic, phonenumber) values (?,?,?,?)";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, lastName);
@@ -135,15 +114,13 @@ public class ConnectionDB {
             preparedStatement.setString(3, patronymic);
             preparedStatement.setString(4, phoneNumber);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Не добавилось(((");
-
+        } catch (SQLException ignored) {
         }
 
     }
 
-    public void updateOrder(String description, String client, String meh, Date createDate, Date endDate, String cost, String status, Long id) {
-        query = "UPDATE orders SET Description = ?, Client = ?, Meh = ?, CreateDate = ?, endDate = ?, cost = ?, status = ? WHERE id = ?";
+    public static void updateOrder(String description, String client, String meh, Date createDate, Date endDate, String cost, String status, long id) {
+        String query = "UPDATE orders SET Description = ?, Client = ?, Meh = ?, CreateDate = ?, endDate = ?, cost = ?, status = ? WHERE id = ?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, description);
@@ -155,16 +132,14 @@ public class ConnectionDB {
             preparedStatement.setString(7, status);
             preparedStatement.setLong(8, id);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Не добавилось(((");
-
+        } catch (SQLException ignored) {
         }
 
     }
 
 
-    public void updateClient(String lastName, String firstName, String patronymic, String phoneNumber, Long id) {
-        query = "UPDATE clients SET lastname = ?, firstname = ?, patronymic = ?, phonenumber = ? WHERE id = ?";
+    public static void updateClient(String lastName, String firstName, String patronymic, String phoneNumber, long id) {
+        String query = "UPDATE clients SET lastname = ?, firstname = ?, patronymic = ?, phonenumber = ? WHERE id = ?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, lastName);
@@ -173,13 +148,12 @@ public class ConnectionDB {
             preparedStatement.setString(4, phoneNumber);
             preparedStatement.setLong(5, id);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Клиент не был обновлён");
+        } catch (SQLException ignored) {
         }
     }
 
-    public void updateMeh(String lastName, String firstName, String patronymic, String payHour, Long id) {
-        query = "UPDATE mehs SET lastname = ?, firstname = ?, patronymic = ?, payhour = ? WHERE id = ?";
+    public static void updateMeh(String lastName, String firstName, String patronymic, String payHour, long id) {
+        String query = "UPDATE mehs SET lastname = ?, firstname = ?, patronymic = ?, payhour = ? WHERE id = ?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, lastName);
@@ -188,46 +162,42 @@ public class ConnectionDB {
             preparedStatement.setString(4, payHour);
             preparedStatement.setLong(5, id);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Механик не был обновлён");
+        } catch (SQLException ignored) {
         }
     }
 
-    public void deleteOrder(Long id) {
-        query = "DELETE from orders WHERE id = ?";
+    public static void deleteOrder(long id) {
+        String query = "DELETE from orders WHERE id = ?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Заказ не был удалён");
+        } catch (SQLException ignored) {
         }
     }
 
-    public void deleteClient(Long id) {
-        query = "DELETE from clients WHERE id = ?";
+    public static void deleteClient(long id) {
+        String query = "DELETE from clients WHERE id = ?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Клиент не был удалён");
+        } catch (SQLException ignored) {
         }
     }
 
-    public void deleteMeh(Long id) {
-        query = "DELETE from mehs WHERE id = ?";
+    public static void deleteMeh(long id) {
+        String query = "DELETE from mehs WHERE id = ?";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Механик не был удалён");
+        } catch (SQLException ignored) {
         }
     }
 
-    public void addMeh(String lastName, String firstName, String patronymic, String payHour) {
-        query = "INSERT INTO mehs (lastname, firstname, patronymic, payhour) values (?,?,?,?)";
+    public static void addMeh(String lastName, String firstName, String patronymic, String payHour) {
+        String query = "INSERT INTO mehs (lastname, firstname, patronymic, payhour) values (?,?,?,?)";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, lastName);
@@ -235,75 +205,75 @@ public class ConnectionDB {
             preparedStatement.setString(3, patronymic);
             preparedStatement.setString(4, payHour);
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("Механик не был добавлен");
+        } catch (SQLException ignored) {
         }
     }
 
-    public Long ifClient(String client) {
-        Long rows = null;
-        query = "SELECT COUNT(Client) FROM orders WHERE Client ='" + client + "'";
+    public static Integer ifClient(String client) {
+        Integer rows = null;
+        ResultSet res;
+        String query = "SELECT COUNT(Client) FROM orders WHERE Client ='" + client + "'";
         try {
             res = statement.executeQuery(query);
             res.next();
-            rows = res.getLong(1);
-        } catch (SQLException e) {
-            System.err.println("Не удалось проверить наличие заказа для указанного клиента");
+            rows = res.getInt(1);
+        } catch (SQLException ignored) {
         }
         return rows;
     }
 
-    public Long ifMeh(String meh) {
-        Long rows = null;
-        query = "SELECT COUNT(Meh) FROM orders WHERE Meh ='" + meh + "'";
+    public static Integer ifMeh(String meh) {
+        Integer rows = null;
+        ResultSet res;
+        String query = "SELECT COUNT(Meh) FROM orders WHERE Meh ='" + meh + "'";
         try {
             res = statement.executeQuery(query);
             res.next();
-            rows = res.getLong(1);
-        } catch (SQLException e) {
-            System.err.println("Не удалось проверить наличие заказа для указанного механика");
+            rows = res.getInt(1);
+        } catch (SQLException ignored) {
         }
         return rows;
     }
 
-    public void getDescription(String description) {
-        query = "SELECT * FROM orders WHERE description LIKE '%" + description + "%'";
+    public static void getDescription(String description) {
+        String query = "SELECT * FROM orders WHERE description LIKE '%" + description + "%'";
+        ResultSet res;
         try {
             res = statement.executeQuery(query);
             while (res.next()) {
-                OrderList.orderArrayList.add(new Order(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), res.getDate(5),
+                Order.orderList.add(new Order(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), res.getDate(5),
                         res.getDate(6), res.getString(7), res.getString(8)));
 
             }
-        } catch (SQLException e) {
-            System.out.println("Не вывелось");
+        } catch (SQLException ignored) {
         }
     }
 
-    public void getClient(String client) {
-        query = "SELECT * FROM orders WHERE Client LIKE '%" + client + "%'";
+    public static void getClient(String client) {
+        String query = "SELECT * FROM orders WHERE Client LIKE '%" + client + "%'";
+        ResultSet res;
         try {
             res = statement.executeQuery(query);
             while (res.next()) {
-                OrderList.orderArrayList.add(new Order(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), res.getDate(5),
+                Order.orderList.add(new Order(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), res.getDate(5),
                         res.getDate(6), res.getString(7), res.getString(8)));
 
             }
-        } catch (SQLException e) {
-            System.out.println("Не вывелось");
+        } catch (SQLException ignored) {
         }
     }
-    public void getStatus(String status) {
-        query = "SELECT * FROM orders WHERE status LIKE '%" + status + "%'";
+
+    public static void getStatus(String status) {
+        String query = "SELECT * FROM orders WHERE status LIKE '%" + status + "%'";
+        ResultSet res;
         try {
             res = statement.executeQuery(query);
             while (res.next()) {
-                OrderList.orderArrayList.add(new Order(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), res.getDate(5),
+                Order.orderList.add(new Order(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), res.getDate(5),
                         res.getDate(6), res.getString(7), res.getString(8)));
 
             }
-        } catch (SQLException e) {
-            System.out.println("Не вывелось");
+        } catch (SQLException ignored) {
         }
     }
 }

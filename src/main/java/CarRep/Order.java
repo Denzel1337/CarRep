@@ -1,18 +1,21 @@
 package CarRep;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Order {
-    private Long id;
-    private String description;
-    private String client;
-    private String meh;
-    private Date createDate;
-    private Date endDate;
-    private String cost;
-    private String status;
+    public static List<Order> orderList = new ArrayList<>();
+    private final long id;
+    private final String description;
+    private final String client;
+    private final String meh;
+    private final Date createDate;
+    private final Date endDate;
+    private final String cost;
+    private final String status;
 
-    public Order(Long id, String description, String client, String meh, Date createDate, Date endDate, String cost, String status) {
+    public Order(long id, String description, String client, String meh, Date createDate, Date endDate, String cost, String status) {
         this.id = id;
         this.description = description;
         this.client = client;
@@ -22,22 +25,37 @@ public class Order {
         this.cost = cost;
         this.status = status;
     }
-    
-    public Long getId() {return id;}
+
+    public long getId() {
+        return id;
+    }
+
     public String getDescription() {
         return description;
     }
+
     public String getClient() {
         return client;
     }
+
     public String getMeh() {
         return meh;
     }
+
     public Date getCreateDate() {
-        return  createDate;
+        return createDate;
     }
-    public Date getEndDate() { return endDate; }
-    public String getCost() { return cost; }
-    public String getStatus() { return status; }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public String getCost() {
+        return cost;
+    }
+
+    public String getStatus() {
+        return status;
+    }
 }
 
